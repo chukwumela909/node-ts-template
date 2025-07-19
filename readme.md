@@ -12,8 +12,30 @@ A modern Node.js API template built with TypeScript, Express, and MongoDB using 
 - ✅ **Health Check** - Server and database monitoring endpoint
 - ✅ **ESLint & Prettier** - Code formatting and linting
 - ✅ **Hot Reload** - Development server with nodemon
+- ✅ **Logging** - Advanced logging with Winston and daily file rotation
+- ✅ **Error Monitoring** - Sentry integration for production error tracking
+- ✅ **CORS Support** - Cross-Origin Resource Sharing enabled
+- ✅ **Environment Configuration** - Centralized environment variable management
+- ✅ **Rate Limiting** - IP-based request rate limiting with configurable limits
 
 ## Quick Start
+
+### Environment Setup
+
+1. Copy environment template:
+```bash
+cp .env.local .env
+```
+
+2. Configure your environment variables in `.env`:
+```bash
+NODE_ENV=development
+PORT=3000
+MONGO_URI=mongodb://localhost:27017/important-modules
+SENTRY_DSN=your_sentry_dsn_here  # Optional for error monitoring
+```
+
+### Development
 
 ```bash
 # Install dependencies
@@ -42,6 +64,10 @@ npm run lint
 
 - `GET /health` - Check server and database status
 
+### Main API
+
+- `GET /` - API status check
+
 ### Tasks API
 
 - `GET /api/v1/tasks` - Get all tasks
@@ -49,6 +75,11 @@ npm run lint
 - `GET /api/v1/tasks/:id` - Get task by ID
 - `PATCH /api/v1/tasks/:id` - Update task
 - `DELETE /api/v1/tasks/:id` - Delete task
+
+### Debug Endpoints (Development Only)
+
+- `GET /debug-sentry` - Test Sentry error tracking
+- `GET /test-rate-limit` - Test rate limiting functionality
 
 ## Project Structure
 
@@ -59,9 +90,19 @@ src/
 ├── routes/            # Route definitions
 ├── utils/             # Utility functions (catchAsync, health)
 ├── configs/           # Configuration files
+│   ├── dbConfig.ts    # Database connection
+│   ├── envConfig.ts   # Environment variables
+│   ├── loggerConfig.ts # Winston logging setup
+│   ├── sentryConfig.ts # Sentry error monitoring
+│   └── rateLimitConfig.ts # Simple rate limiting configuration
 ├── middlewares/       # Custom middleware
+│   ├── errorHandler.ts     # Global error handling
+│   └── catchAll404Errors.ts # 404 error handling
 ├── app.ts            # Express app setup
 └── server.ts         # Server entry point
+logs/                 # Log files (auto-generated)
+├── combined-*.log    # Combined logs with rotation
+└── error-*.log       # Error logs with rotation
 ```
 
 ## Key Patterns
@@ -87,6 +128,12 @@ export const getTask = catchAsync(
 );
 ```
 
+The global error handler provides comprehensive error handling with:
+- MongoDB duplicate key error handling
+- Mongoose validation error handling
+- Different responses for development vs production
+- Automatic error logging
+
 ### Database Models
 
 Using Mongoose schemas with TypeScript interfaces (no classes):
@@ -109,6 +156,45 @@ const TaskSchema = new Schema<ITask>(
 );
 ```
 
+### Logging System
+
+Advanced logging with Winston featuring:
+- Multiple log levels (error, warn, info)
+- Daily rotating files
+- Colored console output for development
+- Automatic log compression and retention
+- Separate error and combined logs
+
+```typescript
+import { globalLog, dbLog, authLog } from './configs/loggerConfig';
+
+globalLog.info('Server started successfully');
+dbLog.error('Database connection failed');
+```
+
+### Error Monitoring
+
+Sentry integration for production error tracking:
+- Automatic error capture and reporting
+- Environment-specific configuration
+- Debug endpoint for testing error tracking
+
+### Rate Limiting
+
+Simple and effective rate limiting:
+- **Basic Rate Limiter**: Applied globally to all routes
+- **Production**: 100 requests per 15 minutes
+- **Development**: 1000 requests per 15 minutes
+- Automatic rate limit headers in response
+- Clean error messages when limits are exceeded
+
+```typescript
+import { rateLimiter } from './configs/rateLimitConfig';
+
+// Apply rate limiting to all routes
+app.use(rateLimiter);
+```
+
 ### Health Monitoring
 
 Simple health check with readable uptime format:
@@ -125,5 +211,44 @@ Simple health check with readable uptime format:
 ```
 
 ## Development
+
+### Dependencies
+
+**Core Dependencies:**
+- `express` - Web framework
+- `mongoose` - MongoDB ODM
+- `cors` - Cross-origin resource sharing
+- `dotenv` - Environment variable loading
+- `http-errors` - HTTP error utilities
+- `winston` & `winston-daily-rotate-file` - Advanced logging
+- `@sentry/node` - Error monitoring and tracking
+- `morgan` - HTTP request logging
+- `cross-env` - Cross-platform environment variables
+- `express-rate-limit` - Request rate limiting
+
+**Development Dependencies:**
+- `typescript` & `ts-node` - TypeScript support
+- `nodemon` - Development hot reload
+- `eslint` & `prettier` - Code quality and formatting
+- `@types/*` - TypeScript type definitions
+
+### Environment Variables
+
+Required environment variables:
+
+```bash
+NODE_ENV=development          # Environment (development/production/prod)
+PORT=3000                    # Server port
+MONGO_URI=mongodb://...      # MongoDB connection string
+SENTRY_DSN=https://...       # Sentry DSN (optional)
+```
+
+### Log Files
+
+The application automatically creates and manages log files in the `logs/` directory:
+- `combined-YYYY-MM-DD-HH.log` - All application logs
+- `error-YYYY-MM-DD-HH.log` - Error logs only
+- Automatic compression and 14-day retention
+- Maximum file size of 20MB
 
 Perfect for developing scalable REST APIs!

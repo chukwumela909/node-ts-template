@@ -51,4 +51,4 @@ You can always refer back to this doc = $ https://blog.logrocket.com/express-typ
     "lint": "eslint 'src/**/*.ts'"
   },
 
-* [MODS]: Integrate logging, using MORGAN and winston and integrate sentry into the app
+* [MODS]: Integrate logging, using MORGAN and winston
