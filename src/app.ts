@@ -2,7 +2,8 @@ import express, { NextFunction, Request, Response } from 'express';
 import * as Sentry from '@sentry/node';
 import cors from 'cors';
 
-import taskRoutes from './routes/taskRoutes';
+import examRoutes from './routes/examRoutes';
+import submissionRoutes from './routes/submissionRoutes';
 import catchAll404Errors from './middlewares/catchAll404Errors';
 import globalErrorHandler from './middlewares/errorHandler';
 import { healthCheck } from './utils/health';
@@ -33,7 +34,8 @@ app.get('/', async (req: Request, res: Response, next: NextFunction) => {
 });
 
 app.use('/health', healthCheck);
-app.use('/api/v1/tasks', taskRoutes);
+app.use('/api/v1/exams', examRoutes);
+app.use('/api/v1/submissions', submissionRoutes);
 
 app.get('/debug-sentry', (req, res) => {
   throw new Error('My first Sentry error!');
