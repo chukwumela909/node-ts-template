@@ -3,7 +3,7 @@
 ## Overview
 This API provides endpoints for managing multiple-choice exams in a school management system. It handles exam creation, student submissions, auto-grading, and score management.
 
-**Base URL**: `http://localhost:3000/api/v1`
+**Base URL**: `https://examservice-m4bz.onrender.com/api/v1`
 
 **Content-Type**: `application/json`
 
