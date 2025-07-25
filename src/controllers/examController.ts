@@ -144,9 +144,9 @@ export const submitExam = catchAsync(
 
     // Check if exam is currently active
     const now = new Date();
-    // if (now < exam.startsAt) {
-    //   return next(createError(400, 'Exam has not started yet'));
-    // }
+    if (now < exam.startsAt) {
+      return next(createError(400, 'Exam has not started yet'));
+    }
     if (now > exam.endsAt) {
       return next(createError(400, 'Exam has already ended'));
     }
